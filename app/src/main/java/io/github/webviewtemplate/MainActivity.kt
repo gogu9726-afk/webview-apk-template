@@ -1,7 +1,7 @@
 package io.github.webviewtemplate
 
 import android.Manifest
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -34,12 +34,32 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import org.json.JSONArray
+import androidx.core.graphics.toColorInt
 
+@SuppressLint("IntentReset", "QueryPermissionsNeeded")
 class MainActivity : AppCompatActivity() {
     private data class PendingWebPermissionRequest(
         val request: PermissionRequest,
         val resources: Array<String>
-    )
+    ) {
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as PendingWebPermissionRequest
+
+            if (request != other.request) return false
+            if (!resources.contentEquals(other.resources)) return false
+
+            return true
+        }
+
+        override fun hashCode(): Int {
+            var result = request.hashCode()
+            result = 31 * result + resources.contentHashCode()
+            return result
+        }
+    }
 
     private lateinit var webView: WebView
     private lateinit var rootContainer: FrameLayout
@@ -80,7 +100,7 @@ class MainActivity : AppCompatActivity() {
             val callback = fileChooserCallback ?: return@registerForActivityResult
             val cameraUri = pendingCameraCaptureUri
             val uris = when {
-                result.resultCode != Activity.RESULT_OK -> null
+                result.resultCode != RESULT_OK -> null
                 cameraUri != null &&
                     result.data?.data == null &&
                     result.data?.clipData == null -> arrayOf(cameraUri)
@@ -88,9 +108,10 @@ class MainActivity : AppCompatActivity() {
             }
             callback.onReceiveValue(uris)
             fileChooserCallback = null
-            clearPendingCameraCapture(deleteFile = result.resultCode != Activity.RESULT_OK)
+            clearPendingCameraCapture(deleteFile = result.resultCode != RESULT_OK)
         }
 
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -371,7 +392,7 @@ class MainActivity : AppCompatActivity() {
         if (value == "transparent" || value == "rgba(0, 0, 0, 0)") {
             return Color.WHITE
         }
-        runCatching { Color.parseColor(value) }.getOrNull()?.let { return it }
+        runCatching { value.toColorInt() }.getOrNull()?.let { return it }
 
         val rgbRegex =
             Regex("""rgba?\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})(?:\s*,\s*([0-9.]+))?\s*\)""")
