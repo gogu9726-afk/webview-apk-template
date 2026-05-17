@@ -7,6 +7,8 @@
 
 There are no lint or test commands worth running — the project has no unit tests and no custom lint config.
 
+A `workflow_dispatch` GitHub Actions workflow lives at `.github/workflows/build.yml`. It exposes the three `app.properties` values as inputs and a `debug`/`release` choice; signed release builds require `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, and `KEY_PASSWORD` repository secrets.
+
 # Configuration
 
 All app-specific values live in **`app.properties`** (project root):
@@ -36,5 +38,5 @@ Key behaviors implemented in `MainActivity`:
 # SDK / Tooling
 
 - Kotlin, AGP 9.2.1, Gradle wrapper 9.5.1
-- `compileSdk` / `targetSdk` 36, `minSdk` 24
+- `compileSdk` / `targetSdk` 37, `minSdk` 24
 - Version catalog: `gradle/libs.versions.toml`
