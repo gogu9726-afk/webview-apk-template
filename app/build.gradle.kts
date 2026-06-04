@@ -5,12 +5,12 @@ plugins {
 }
 
 val appProperties = Properties()
-rootProject.file("app.properties").inputStream().use { appProperties.load(it) }
+rootProject.file("app.properties").reader(Charsets.UTF_8).use { appProperties.load(it) }
 
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("keystore.properties")
 if (keystorePropertiesFile.exists()) {
-    keystorePropertiesFile.inputStream().use { keystoreProperties.load(it) }
+    keystorePropertiesFile.reader(Charsets.UTF_8).use { keystoreProperties.load(it) }
 }
 
 android {
